@@ -1,0 +1,179 @@
+import flet as ft
+import asyncio
+
+def main(page: ft.Page):
+    
+    page.title = "Formulário de Contato"
+    page.theme_mode = ft.ThemeMode.DARK
+    page.bgcolor = "#121212"
+    page.horizontal_alignment = "center"
+    page.vertical_alignment = "center"
+    page.padding = 30
+    
+    
+   
+
+    
+    PRIMARY = "#00e676"     
+    SUCCESS = "#00c853"     
+    FIELD_BG = "#1e1e1e"    
+    BORDER = "#2e7d32"      
+
+    
+    title = ft.Text(
+        "💬 Entre em Contato",
+        size=28,
+        weight=ft.FontWeight.W_600,
+        color=PRIMARY,
+        text_align=ft.TextAlign.CENTER
+    )
+
+   
+    nome = ft.TextField(
+        label="Nome Completo",
+        hint_text="Digite seu nome",
+        border_radius=12,
+        border_color=BORDER,
+        focused_border_color=PRIMARY,
+        text_size=15,
+        filled=True,
+        fill_color=FIELD_BG,
+        color="white",
+        hint_style=ft.TextStyle(color="#888")
+    )
+
+    email = ft.TextField(
+        label="E-mail",
+        hint_text="Digite seu e-mail",
+        border_radius=12,
+        border_color=BORDER,
+        focused_border_color=PRIMARY,
+        text_size=15,
+        filled=True,
+        fill_color=FIELD_BG,
+        color="white",
+        hint_style=ft.TextStyle(color="#888")
+    )
+
+    mensagem = ft.TextField(
+        label="Mensagem",
+        hint_text="Escreva sua mensagem...",
+        multiline=True,
+        min_lines=4,
+        max_lines=6,
+        border_radius=12,
+        border_color=BORDER,
+        focused_border_color=PRIMARY,
+        text_size=15,
+        filled=True,
+        fill_color=FIELD_BG,
+        color="white",
+        hint_style=ft.TextStyle(color="#888")
+    )
+
+    
+    confirmation_banner = ft.Container(
+        content=ft.Row(
+            [
+                ft.Icon(ft.icons.CHECK_CIRCLE_OUTLINE, color="white"),
+                ft.Text("Mensagem enviada com sucesso!", color="white", weight="bold"),
+            ],
+            alignment=ft.MainAxisAlignment.CENTER
+        ),
+        bgcolor=SUCCESS,
+        border_radius=10,
+        padding=15,
+        visible=False,
+        animate_opacity=300
+    )
+
+   
+    def submit_form(e):
+        has_error = False
+
+        if not nome.value:
+            nome.error_text = "Digite seu nome"
+            has_error = True
+        else:
+            nome.error_text = None
+
+        if not email.value or "@" not in email.value:
+            email.error_text = "Digite um e-mail válido"
+            has_error = True
+        else:
+            email.error_text = None
+
+        if not mensagem.value:
+            mensagem.error_text = "Digite sua mensagem"
+            has_error = True
+        else:
+            mensagem.error_text = None
+
+        page.update()
+
+        if has_error:
+            return
+
+        confirmation_banner.visible = True
+        submit_button.disabled = True
+        page.update()
+
+        async def reset_form():
+            await asyncio.sleep(2.5)
+            nome.value = ""
+            email.value = ""
+            mensagem.value = ""
+            confirmation_banner.visible = False
+            submit_button.disabled = False
+            page.update()
+
+        page.run_task(reset_form)
+
+   
+    submit_button = ft.ElevatedButton(
+        text="Enviar Mensagem",
+        icon=ft.icons.SEND,
+        bgcolor=PRIMARY,
+        color="black",
+        height=48,
+        style=ft.ButtonStyle(shape=ft.RoundedRectangleBorder(radius=12)),
+        on_click=submit_form
+    )
+
+    
+    form_fields = ft.Column(
+        [
+            title,
+            ft.Divider(height=20, color="transparent"),
+            nome,
+            email,
+            mensagem,
+            ft.Divider(height=10, color="transparent"),
+            submit_button,
+            ft.Divider(height=10, color="transparent"),
+            confirmation_banner
+        ],
+        spacing=15,
+        alignment=ft.MainAxisAlignment.CENTER,
+        horizontal_alignment=ft.CrossAxisAlignment.CENTER,
+        width=400
+    )
+
+    
+    page.add(
+        ft.Container(
+            content=form_fields,
+            padding=30,
+            bgcolor="#1b1b1b",
+            border_radius=20,
+            shadow=ft.BoxShadow(
+                blur_radius=25,
+                spread_radius=2,
+                color=ft.colors.with_opacity(0.4, "black"),
+                offset=ft.Offset(0, 6)
+            )
+        )
+    )
+
+# Iniciar app
+ft.app(target=main)
